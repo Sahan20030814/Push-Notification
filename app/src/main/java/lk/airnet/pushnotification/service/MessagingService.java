@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -16,8 +17,15 @@ import com.google.firebase.messaging.RemoteMessage;
 import lk.airnet.pushnotification.R;
 import lk.airnet.pushnotification.activity.MainActivity;
 
-@SuppressLint("MissingFirebaseInstanceTokenRefresh")
 public class MessagingService extends FirebaseMessagingService {
+
+    private static final String TAG = MessagingService.class.getSimpleName();
+
+    @Override
+    public void onNewToken(@NonNull String token) {
+        Log.i(TAG, "Token: " + token);
+    }
+
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         String title = message.getNotification() != null ?
@@ -28,10 +36,11 @@ public class MessagingService extends FirebaseMessagingService {
 
     private void sendNotification(String title, String messageBody) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);  /// Me FLAG_ACTIVITY_CLEAR_TOP kiyana eken firebase eken ena notification eka click karapu gaman MainActivity eka udatama eno.
 
         int requestCode = 0;
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, requestCode, intent, PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, requestCode, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         String channel_id = "default_channel";
         NotificationCompat.Builder notificaBuilder = new NotificationCompat.Builder(this, channel_id)
